@@ -1,26 +1,19 @@
 """
 =========================================
 NetVision Agent
-Author: Kratika Yadav
 =========================================
 """
 
 import socket
 import platform
 import getpass
-import sys
-import os
-
-# Allow imports from project root
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+import time
 
 from agent.config import HOST, PORT
 from shared.protocol import send_json, receive_json
-from shared.constants import REGISTER
-
-# -------------------------------
-# Create Socket
-# -------------------------------
+from shared.packet import Packet
+from shared.constants import REGISTER, HEARTBEAT, SYSTEM_INFO
+from agent.monitor import get_system_info
 
 agent = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -30,26 +23,51 @@ print("=" * 50)
 print("NetVision Agent Started")
 print("=" * 50)
 
-# -------------------------------
-# Device Information
-# -------------------------------
-
 device = {
     "hostname": platform.node(),
     "os": platform.system(),
     "username": getpass.getuser()
 }
 
-packet = {
-    "type": REGISTER,
-    "payload": device
-}
+register_packet = Packet(
+    REGISTER,
+    device
+)
 
-send_json(agent, packet)
+send_json(agent, register_packet)
 
 reply = receive_json(agent)
 
-print("\nServer Response")
 print(reply["payload"]["message"])
 
-agent.close()
+print("\nSending heartbeat every 5 seconds...\n")
+
+try:
+
+    while True:
+
+        heartbeat = Packet(
+            HEARTBEAT,
+            {
+                "hostname": platform.node()
+            }
+        )
+
+        send_json(agent, heartbeat)
+
+        system_packet = Packet(
+            SYSTEM_INFO,
+            get_system_info()
+        )
+
+        send_json(agent, system_packet)
+
+        time.sleep(5)
+
+except KeyboardInterrupt:
+
+    print("\nAgent Stopped")
+
+finally:
+
+    agent.close()

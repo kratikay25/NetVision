@@ -1,21 +1,17 @@
 import json
 
 
-def send_json(socket, data):
-    """
-    Send a JSON object through a socket.
-    """
+def send_json(sock, packet):
 
-    message = json.dumps(data)
+    data = json.dumps(packet.to_dict())
 
-    socket.sendall(message.encode())
+    sock.sendall(data.encode())
 
 
-def receive_json(socket):
-    """
-    Receive a JSON object from a socket.
-    """
+def receive_json(sock):
 
-    message = socket.recv(4096).decode()
+    data = sock.recv(4096).decode()
 
-    return json.loads(message)
+    dictionary = json.loads(data)
+
+    return dictionary
