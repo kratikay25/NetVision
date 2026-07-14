@@ -7,6 +7,7 @@ Routes packets received from agents.
 from shared.packet import Packet
 from shared.protocol import receive_json, send_json
 from shared.constants import REGISTER, WELCOME, HEARTBEAT, SYSTEM_INFO
+from server.dashboard import show_dashboard
 
 
 class Router:
@@ -36,8 +37,6 @@ class Router:
                         packet.payload
                     )
 
-                    print(f"\n🟢 Registered : {hostname}")
-
                     welcome = Packet(
                         WELCOME,
                         {
@@ -49,7 +48,9 @@ class Router:
 
                 elif packet.packet_type == HEARTBEAT:
 
-                    print(f"Working {hostname}")
+                    # Heartbeat received.
+                    # Dashboard will refresh when SYSTEM_INFO arrives.
+                    pass
 
                 elif packet.packet_type == SYSTEM_INFO:
 
@@ -58,19 +59,11 @@ class Router:
                         packet.payload
                     )
 
-                    info = self.agent_manager.get(hostname)
-
-                    print("\n" + "=" * 45)
-                    print(f"Agent    : {hostname}")
-                    print(f"CPU      : {info['cpu']} %")
-                    print(f"Memory   : {info['memory']} %")
-                    print(f"Disk     : {info['disk']} %")
-                    print(f"Battery  : {info['battery']} %")
-                    print("=" * 45)
+                    show_dashboard(self.agent_manager)
 
         except Exception as e:
 
-            print(f"\n🔴 Disconnected : {hostname}")
+            print(f"\nDisconnected: {hostname}")
             print(f"Reason: {e}")
 
         finally:
