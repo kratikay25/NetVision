@@ -8,12 +8,33 @@ import socket
 import platform
 import getpass
 import time
+import argparse
 
-from agent.config import HOST, PORT
+from agent.config import HOST, PORT, AGENT_NAME
 from shared.protocol import send_json, receive_json
 from shared.packet import Packet
 from shared.constants import REGISTER, HEARTBEAT, SYSTEM_INFO
 from agent.monitor import get_system_info
+
+
+# ----------------------------
+# Command Line Arguments
+# ----------------------------
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    "--name",
+    help="Agent hostname"
+)
+
+args = parser.parse_args()
+
+hostname = args.name if args.name else AGENT_NAME
+
+# ----------------------------
+# Connect to Server
+# ----------------------------
 
 agent = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -24,7 +45,7 @@ print("NetVision Agent Started")
 print("=" * 50)
 
 device = {
-    "hostname": platform.node(),
+    "hostname": hostname,
     "os": platform.system(),
     "username": getpass.getuser()
 }
@@ -49,7 +70,7 @@ try:
         heartbeat = Packet(
             HEARTBEAT,
             {
-                "hostname": platform.node()
+                "hostname": hostname
             }
         )
 
