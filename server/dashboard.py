@@ -4,6 +4,7 @@ NetVision Enterprise Dashboard
 
 import os
 from datetime import datetime
+from server.alerts import check_alerts
 
 
 def clear_screen():
@@ -53,4 +54,31 @@ def show_dashboard(agent_manager):
         )
 
     print("+----------------------------+----------+----------+---------+----------+-------+-------+--------+")
+
     print("\n" + "=" * 110)
+
+    # ---------------- ALERT SECTION ----------------
+
+    print("\n" + "=" * 90)
+    print("ACTIVE ALERTS")
+    print("=" * 90)
+
+    found = False
+
+    for agent in agent_manager.get_all().values():
+
+        alerts = check_alerts(agent)
+
+        if alerts:
+
+            found = True
+
+            print(f"\n🚨 {agent['hostname']}")
+
+            for alert in alerts:
+                print(f"   • {alert}")
+
+    if not found:
+        print("\nNo active alerts.")
+
+    print("\n" + "=" * 90)

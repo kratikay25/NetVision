@@ -9,6 +9,7 @@ from server.connection import ConnectionManager
 from server.agent_manager import AgentManager
 from server.router import Router
 from server.dashboard import show_dashboard
+from server.database import initialize_database
 
 
 def monitor_agents(agent_manager):
@@ -29,6 +30,8 @@ agents = AgentManager()
 router = Router(agents)
 
 connection.start()
+
+initialize_database()
 
 # Start monitoring thread
 monitor_thread = threading.Thread(

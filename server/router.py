@@ -8,6 +8,7 @@ from shared.packet import Packet
 from shared.protocol import receive_json, send_json
 from shared.constants import REGISTER, WELCOME, HEARTBEAT, SYSTEM_INFO
 from server.dashboard import show_dashboard
+from server.database import save_metrics
 
 
 class Router:
@@ -48,8 +49,6 @@ class Router:
 
                 elif packet.packet_type == HEARTBEAT:
 
-                    # Heartbeat received.
-                    # Dashboard will refresh when SYSTEM_INFO arrives.
                     pass
 
                 elif packet.packet_type == SYSTEM_INFO:
@@ -58,6 +57,10 @@ class Router:
                         hostname,
                         packet.payload
                     )
+
+                    agent = self.agent_manager.get(hostname)
+
+                    save_metrics(agent)
 
                     show_dashboard(self.agent_manager)
 
@@ -68,7 +71,7 @@ class Router:
 
         finally:
 
-          if hostname and hostname in self.agent_manager.agents:
-            self.agent_manager.agents[hostname]["status"] = "OFFLINE"
+            if hostname and hostname in self.agent_manager.agents:
+                self.agent_manager.agents[hostname]["status"] = "OFFLINE"
 
-          agent_socket.close()
+            agent_socket.close()
