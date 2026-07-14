@@ -68,6 +68,7 @@ class Router:
 
         finally:
 
-            self.agent_manager.remove(hostname)
+          if hostname and hostname in self.agent_manager.agents:
+            self.agent_manager.agents[hostname]["status"] = "OFFLINE"
 
-            agent_socket.close()
+          agent_socket.close()
