@@ -16,9 +16,8 @@ from shared.packet import Packet
 from shared.constants import REGISTER, HEARTBEAT, SYSTEM_INFO
 from agent.monitor import get_system_info
 
-
 # ----------------------------
-# Command Line Arguments
+# Command-line arguments
 # ----------------------------
 
 parser = argparse.ArgumentParser()
