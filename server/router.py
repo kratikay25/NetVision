@@ -6,7 +6,13 @@ Routes packets received from agents.
 
 from shared.packet import Packet
 from shared.protocol import receive_json, send_json
-from shared.constants import REGISTER, WELCOME, HEARTBEAT, SYSTEM_INFO
+from shared.constants import (
+    REGISTER,
+    WELCOME,
+    HEARTBEAT,
+    SYSTEM_INFO,
+    COMMAND_RESPONSE
+)
 from server.dashboard import show_dashboard
 from server.database import save_metrics
 
@@ -63,6 +69,13 @@ class Router:
                     save_metrics(agent)
 
                     show_dashboard(self.agent_manager)
+
+                elif packet.packet_type == COMMAND_RESPONSE:
+
+                    print(
+                        f"\nCommand response from {hostname}: "
+                        f"{packet.payload.get('response')}"
+                    )
 
         except Exception as e:
 
